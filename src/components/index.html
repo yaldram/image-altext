@@ -36,13 +36,19 @@
       </form>
     </div>
 
-    <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-lg font-semibold mb-4">Alt Text Descriptions</h2>
-      <ul id="altTextContainer">
+    <div>
+      <div id="previewContainer" class="flex justify-center items-center hidden">
+        <img id="imagePreview" src="#" alt="Image Preview" class="max-w-full max-h-40">
+      </div>
 
-      </ul>
-      <div class="flex justify-center mt-4" id="loadingIndicator" style="display: none;">
-        <div class="border-gray-300 h-10 w-10 animate-spin rounded-full border-8 border-t-blue-600" />
+      <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold mb-4">Alt Text Descriptions</h2>
+        <ul id="altTextContainer">
+
+        </ul>
+        <div class="flex justify-center mt-4" id="loadingIndicator" style="display: none;">
+          <div class="border-gray-300 h-10 w-10 animate-spin rounded-full border-8 border-t-blue-600" />
+        </div>
       </div>
     </div>
   </main>
@@ -52,6 +58,21 @@
 </html>
 
 <script>
+  document.getElementById('imageUpload').addEventListener('change', function () {
+    const file = this.files[0];
+    const previewContainer = document.getElementById('previewContainer');
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        document.getElementById('imagePreview').setAttribute('src', event.target.result);
+        previewContainer.classList.remove('hidden');
+      }
+      reader.readAsDataURL(file);
+    } else {
+      previewContainer.classList.add('hidden');
+    }
+  });
+
   document.getElementById('imageForm').addEventListener('submit', function (event) {
     event.preventDefault();
     const formData = new FormData(this);
