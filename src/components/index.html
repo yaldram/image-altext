@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloudflare AI</title>
+  <!-- Link to Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <!-- Header Section -->
+  <header class="bg-gray-800 text-white py-4">
+    <div class="container mx-auto px-4">
+      <h1 class="text-2xl font-bold">Alt Text AI</h1>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <div class="max-w-lg mx-auto">
+      <!-- Form Section -->
+      <form id="imageForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <fieldset>
+          <legend class="block text-gray-700 text-sm font-bold mb-2">Upload Image:</legend>
+          <!-- Image Upload -->
+          <div class="mb-4">
+            <input type="file" accept=".png, .jpg" id="imageUpload" name="image"
+              class="border rounded-lg px-4 py-2 w-full">
+          </div>
+        </fieldset>
+        <button type="submit" id="generateAltText"
+          class="bg-blue-500 w-full hover:bg-blue-600 disabled:bg-gray-300 disabled:text-black disabled:cursor-not-allowed disabled:opacity-50 text-white font-bold py-2 px-4 rounded">
+          Generate Alt Text
+        </button>
+      </form>
+    </div>
+
+    <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-lg font-semibold mb-4">Alt Text Descriptions</h2>
+      <ul id="altTextContainer">
+
+      </ul>
+      <div class="flex justify-center mt-4" id="loadingIndicator" style="display: none;">
+        <div class="border-gray-300 h-10 w-10 animate-spin rounded-full border-8 border-t-blue-600" />
+      </div>
+    </div>
+  </main>
+
+</body>
+
+</html>
+
+<script>
+  document.getElementById('imageForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+
+    document.getElementById('loadingIndicator').style.display = 'flex';
+    document.getElementById('generateAltText').disabled = true;
+    document.getElementById('generateAltText').textContent = 'Generating...';
+
+    fetch('/generate-alt-texts', {
+      method: 'POST',
+      body: formData
+    })
+      .then(response => response.json())
+      .then(data => {
+        displayAltText(data.response);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      })
+      .finally(() => {
+        document.getElementById('loadingIndicator').style.display = 'none';
+        document.getElementById('generateAltText').disabled = false;
+        document.getElementById('generateAltText').textContent = 'Generate Alt Text';
+      })
+  });
+
+  function displayAltText(altTextDescriptions) {
+    const altTextContainer = document.getElementById('altTextContainer');
+
+    // Clear previous content
+    altTextContainer.innerHTML = '';
+
+    // Create list items for each alt text description
+    altTextDescriptions.split('\n').forEach((description, index) => {
+      if (description.trim() !== '') {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${description.trim()}`;
+        altTextContainer.appendChild(listItem);
+      }
+    });
+  }
+</script>
